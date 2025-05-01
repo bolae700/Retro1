@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RETRO.PAVLY</title>
+    <style>
+        :root {
+            --green: #00FF00;
+            --black: #000000;
+        }
+
+        body {
+            background: var(--black);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .retro-machine {
+            width: 300px;
+            height: 430px;
+            background: var(--black);
+            border: 2px solid var(--green);
+            padding: 10px;
+            position: relative;
+        }
+
+        .command-display {
+            height: 20px;
+            border: 1px solid var(--green);
+            margin-bottom: 5px;
+            color: var(--green);
+            font-size: 10px;
+            padding: 2px;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .playlist-container {
+            height: 180px;
+            border: 1px solid var(--green);
+            margin-bottom: 5px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .playlist-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .playlist-container::-webkit-scrollbar-track {
+            background: var(--black);
+        }
+
+        .playlist-container::-webkit-scrollbar-thumb {
+            background: var(--green);
+        }
+
+        .playlist-item {
+            color: var(--green);
+            font-size: 11px;
+            padding: 4px;
+            cursor: pointer;
+            border-bottom: 1px solid #002200;
+            transition: all 0.2s;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .playlist-item:hover {
+            background: #002200;
+            transform: translateX(3px);
+        }
+
+        .player-display {
+            height: 80px;
+            border: 1px solid var(--green);
+            margin-bottom: 5px;
+            padding: 5px;
+            position: relative;
+        }
+
+        #visualizer {
+            position: absolute;
+            bottom: 5px;
+            left: 5px;
+            width: calc(100% - 10px);
+            height: 30px;
+        }
+
+        .track-info {
+            color: var(--green);
+            font-size: 12px;
+            margin-bottom: 3px;
+            text-shadow: 0 0 5px var(--green);
+        }
+
+        .time-display {
+            color: var(--green);
+            font-size: 10px;
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+        }
+
+        .control-row {
+            display: flex;
+            gap: 5px;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .pixel-btn {
+            width: 23%;
+            height: 25px;
+            background: var(--black);
+            border: 1px solid var(--green);
+            color: var(--green);
+            font-size: 10px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+
+        .pixel-btn:hover {
+            background: var(--green);
+            color: var(--black);
+            transform: scale(1.05);
+        }
+
+        .status-bar {
+            position: absolute;
+            bottom: 2px;
+            left: 5px;
+            color: var(--green);
+            font-size: 9px;
+        }
+
+        .progress-container {
+            height: 3px;
+            background: #002200;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--green);
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+    </style>
+</head>
+<body>
+    <div class="retro-machine">
+        <div class="command-display" id="cmd">SYSTEM READY</div>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <div class="playlist-container">
+            <div class="playlist-item" data-src="https://raw.githubusercontent.com/bolae700/Songs/main/J%20Balvin%20Willy%20William%20-%20Mi%20Gente%20(MVDNES%20Remix)%20Fast%20and%20Furious%20%5BChase%20Scene%5D.mp3">1. Mi Gente - J Balvin</div>
+            <div class="playlist-item" data-src="https://raw.githubusercontent.com/bolae700/Songs/main/Lana%20Del%20Rey%20-%20Summertime%20Sadness%20(Wren%20Remix).mp3">2. Summertime Sadness - Lana Del Rey</div>
+            <div class="playlist-item" data-src="https://raw.githubusercontent.com/bolae700/Songs/main/Lève-toi%20et%20Danse.mp3">3. Lève-toi et Danse - Bola Emad</div>
+            <div class="playlist-item" data-src="https://raw.githubusercontent.com/bolae700/Songs/main/Serhat%20Durmus%20-%20Hislerim%20(%20Bass%20Boosted%20).mp3">4. Hislerim - Serhat Durmus</div>
+            <div class="playlist-item" data-src="https://raw.githubusercontent.com/bolae700/Songs/main/Sweet%20Dreams%20-%20Deep%20Remix%20(Bass%20Boosted).mp3">5. Sweet Dreams - Remix</div>
+            <div class="playlist-item" data-src="https://raw.githubusercontent.com/bolae700/Songs/main/%D8%A7%D8%BA%D9%86%D9%8A%D8%A9%20%D8%AA%D8%B1%D9%83%D9%8A%D8%A9%20%D8%B1%D8%A7%D8%A6%D8%B9%D8%A9%20-%20%D8%AD%D8%B1%D9%82%D8%AA%20%D9%82%D9%84%D8%A8%D9%8A%20-%20%D9%85%D8%AA%D8%B1%D8%AC%D9%85%D8%A9%20%D9%84%D9%84%D8%B9%D8%B1%D8%A8%D9%8A%D8%A9%20Yusuf%20%C5%9Eahin%20Ft.%20Ahsen%20Almaz%20-%20Yand%C4%B1rd%C4%B1n%20Kalbimi.mp3">6. Yandırdın Kalbimi - Yusuf Şahin</div>
+            <div class="playlist-item" data-src="https://raw.githubusercontent.com/bolae700/Songs/main/Indila%20-%20Ainsi%20Bas%20La%20Vida%20(Marcoz%20Lima%20Remix).mp3">7. Ainsi Bas La Vida (REMIX) - Indila</div>
+            <div class="playlist-item" data-src="https://raw.githubusercontent.com/bolae700/Songs/main/Emre%20Kabak%20-%20Casablanca.mp3">8. Casablanca - Emre Kabak</div>
+            <div class="playlist-item" data-src="https://raw.githubusercontent.com/bolae700/Songs/main/CJ%20-%20WHOOPTY%20(ERS%20Remix)%20Baby%20Driver.mp3">9. WHOOPTY - CJ</div>
+            <div class="playlist-item" data-src="https://raw.githubusercontent.com/bolae700/Songs/main/BABEL%20(%20Emre%20Kabak%20Remix)%20CAR%20VIDEO.mp3">10. BABEL - Emre Kabak</div>
+            <div class="playlist-item" data-src="https://raw.githubusercontent.com/bolae700/Songs/main/Dj%20Kantik%20-%20Teriyaki%20Boyz%20-%20Tokyo%20Drift%20%26%20Sean%20Paul%20-%20Temperature%20(Remix).mp3">11. Tokyo Drift - Teriyaki Boyz</div>
+            <div class="playlist-item" data-src="https://raw.githubusercontent.com/bolae700/Songs/main/Indila%20-%20Ainsi%20Bas%20La%20Vida%20(Lyrics).mp3">12. Ainsi Bas La Vida - Indila</div>
+            <div class="playlist-item" data-src="https://raw.githubusercontent.com/bolae700/Songs/main/Indila%20-%20Tourner%20Dans%20Le%20Vide%20(Official%20Music%20Video).mp3">13. Tourner Dans Le Vide - Indila</div>
+            <div class="playlist-item" data-src="https://raw.githubusercontent.com/bolae700/Songs/main/Indila%20-%20Derni%C3%A8re%20Danse%20(Clip%20Officiel).mp3">14. Dernière Danse - Indila</div>
+        </div>
+
+        <div class="player-display">
+            <div class="track-info" id="currentTrack">TRACK: ...</div>
+            <canvas id="visualizer"></canvas>
+            <div class="time-display" id="timeDisplay">00:00 / 00:00</div>
+        </div>
+
+        <div class="control-row">
+            <button class="pixel-btn" onclick="skip(-10)">REW</button>
+            <button class="pixel-btn" onclick="togglePlay()" id="playBtn">PLAY</button>
+            <button class="pixel-btn" onclick="skip(10)">FF</button>
+            <button class="pixel-btn" onclick="shuffle()">SHF</button>
+        </div>
+
+        <div class="control-row" style="margin-top:5px">
+            <button class="pixel-btn" onclick="adjustVolume(-0.1)">VOL-</button>
+            <button class="pixel-btn" onclick="toggleMute()" id="muteBtn">MUTE</button>
+            <button class="pixel-btn" onclick="adjustVolume(0.1)">VOL+</button>
+            <button class="pixel-btn" onclick="toggleLoop()" id="loopBtn">LOOP</button>
+        </div>
+
+        <div class="status-bar" id="status">[PAVLY SYSTEM v2.0]</div>
+    </div>
+
+    <script>
+        const audio = new Audio();
+        audio.crossOrigin = "anonymous";
+        let currentTrack = 0;
+        let isPlaying = false;
+        let audioContext, analyser, source;
+        const playlistItems = document.querySelectorAll('.playlist-item');
+        const canvas = document.getElementById('visualizer');
+        const ctx = canvas.getContext('2d');
+        
+        // تهيئة الفيزوالايزر
+        canvas.width = 280;
+        canvas.height = 30;
+        
+        function initAudioContext() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioContext.createAnalyser();
+                source = audioContext.createMediaElementSource(audio);
+                source.connect(analyser);
+                analyser.connect(audioContext.destination);
+                analyser.fftSize = 64;
+            }
+        }
+
+        function visualize() {
+            if (!analyser) return;
+            
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            analyser.getByteFrequencyData(dataArray);
+
+            requestAnimationFrame(visualize);
+            
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.strokeStyle = '#00FF00';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            
+            const sliceWidth = canvas.width / bufferLength;
+            let x = 0;
+            
+            for(let i = 0; i < bufferLength; i++) {
+                const v = dataArray[i] / 128;
+                const y = v * canvas.height/2;
+                
+                if(i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+                
+                x += sliceWidth;
+            }
+            
+            ctx.stroke();
+        }
+
+        function logCommand(msg) {
+            document.getElementById('cmd').textContent = `> ${msg}`;
+            setTimeout(() => document.getElementById('cmd').textContent = '', 2000);
+        }
+
+        function updateDisplay() {
+            document.getElementById('currentTrack').textContent = 
+                `TRACK: ${playlistItems[currentTrack].textContent.split(' - ')[1]}`;
+            
+            document.getElementById('timeDisplay').textContent = 
+                `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
+        }
+
+        function formatTime(sec) {
+            return isNaN(sec) ? '00:00' : 
+                `${Math.floor(sec/60).toString().padStart(2,'0')}:${Math.floor(sec%60).toString().padStart(2,'0')}`;
+        }
+
+        function loadTrack(index) {
+            currentTrack = index;
+            audio.src = playlistItems[currentTrack].dataset.src;
+            playlistItems.forEach(item => item.style.background = 'transparent');
+            playlistItems[currentTrack].style.background = '#002200';
+            logCommand(`LOADING TRACK ${currentTrack + 1}`);
+            
+            audio.play().then(() => {
+                isPlaying = true;
+                document.getElementById('playBtn').textContent = 'PAUSE';
+                if (!audioContext) initAudioContext();
+                visualize();
+            }).catch(error => {
+                console.error('Error playing audio:', error);
+                logCommand('PLAYBACK ERROR');
+            });
+        }
+
+        function togglePlay() {
+            if(audio.paused) {
+                audio.play();
+                if (!audioContext) initAudioContext();
+                logCommand('PLAY');
+            } else {
+                audio.pause();
+                logCommand('PAUSE');
+            }
+        }
+
+        function skip(sec) {
+            audio.currentTime += sec;
+            logCommand(`SKIP ${sec > 0 ? '+' : ''}${sec}S`);
+        }
+
+        function shuffle() {
+            const shuffled = [...playlistItems].sort(() => Math.random() - 0.5);
+            document.querySelector('.playlist-container').innerHTML = '';
+            shuffled.forEach(item => document.querySelector('.playlist-container').appendChild(item));
+            logCommand('SHUFFLE ACTIVATED');
+        }
+
+        function adjustVolume(step) {
+            audio.volume = Math.min(1, Math.max(0, audio.volume + step));
+            logCommand(`VOL ${Math.round(audio.volume*100)}%`);
+        }
+
+        function toggleMute() {
+            audio.muted = !audio.muted;
+            document.getElementById('muteBtn').textContent = audio.muted ? 'UNMUTE' : 'MUTE';
+            logCommand(audio.muted ? 'MUTE ON' : 'MUTE OFF');
+        }
+
+        function toggleLoop() {
+            audio.loop = !audio.loop;
+            document.getElementById('loopBtn').style.background = audio.loop ? '#002200' : 'transparent';
+            logCommand(`LOOP ${audio.loop ? 'ON' : 'OFF'}`);
+        }
+
+        // Event Listeners
+        audio.addEventListener('timeupdate', () => {
+            const progress = (audio.currentTime / audio.duration) * 100 || 0;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            updateDisplay();
+        });
+
+        document.querySelector('.progress-container').addEventListener('click', (e) => {
+            const rect = e.target.getBoundingClientRect();
+            const pos = (e.clientX - rect.left) / rect.width;
+            audio.currentTime = pos * audio.duration;
+        });
+
+        audio.addEventListener('play', () => {
+            document.getElementById('playBtn').textContent = 'PAUSE';
+            document.getElementById('status').textContent = '[PLAYING]';
+        });
+
+        audio.addEventListener('pause', () => {
+            document.getElementById('playBtn').textContent = 'PLAY';
+            document.getElementById('status').textContent = '[PAUSED]';
+        });
+
+        audio.addEventListener('ended', () => {
+            if(!audio.loop) {
+                currentTrack = (currentTrack + 1) % playlistItems.length;
+                loadTrack(currentTrack);
+            }
+        });
+
+        playlistItems.forEach((item, index) => {
+            item.addEventListener('click', () => loadTrack(index));
+        });
+
+        // Initialize first track
+        document.addEventListener('click', () => {
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+        });
+        loadTrack(0);
+        audio.volume = 0.8;
+    </script>
+</body>
+</html>
